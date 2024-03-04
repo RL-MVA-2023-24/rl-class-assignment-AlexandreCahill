@@ -48,27 +48,25 @@ class DQN(nn.Module):
             x = F.relu(hidden_layer(x))
         return self.out_layer(x)
 
-
-
-config = {'model_name': 'best_agent_4',
+config = {'model_name': 'final_agent',
         'max_episode': 300,
-        'gamma': 0.9,
-        'batch_size': 1024,
-        'buffer_size': 1000000,
-        'intermediate_size': 512,
-        'depth': 6,
-        'criterion': torch.nn.SmoothL1Loss(),
-        'learning_rate': 0.01,
-        'gradient_steps': 1,
         'update_target_strategy': 'ema',
-        'update_target_freq': 20,
+        'update_target_freq': 20,    
         'update_target_tau': 0.05,
         'monitoring_nb_trials': 0,
         'monitoring_freq': 10,
+        'gamma': 0.9,
         'epsilon_max': 1.,
         'epsilon_min': 0.01,
+        'batch_size': 1024,
+        'buffer_size': 10000,
         'epsilon_decay_period': 10000,
-        'epsilon_delay_decay': 2000
+        'depth': 5,
+        'epsilon_delay_decay': 2000,
+        'intermediate_size': 256,
+        'criterion': torch.nn.SmoothL1Loss(),
+        'learning_rate': 0.01,
+        'gradient_steps': 1,
     }
 
 class ProjectAgent:
@@ -240,28 +238,43 @@ class ProjectAgent:
         
 if __name__ == "__main__":
     
-
-
     config = {
         'max_episode': 300,
-        'model_name': 'best_agent_4',
+        
+        'model_name': 'final_agent',
+        
+        'update_target_strategy': 'ema',
+        
+        'update_target_freq': 20,
+        
+        'update_target_tau': 0.05,
+        
+        'monitoring_nb_trials': 0,
+
+        'monitoring_freq': 10,
+
         'gamma': 0.9,
-        'batch_size': 1024,
-        'buffer_size': 1000000,
+
         'epsilon_max': 1.,
+
         'epsilon_min': 0.01,
+
+        'batch_size': 1024,
+
+        'buffer_size': 10000,
+
         'epsilon_decay_period': 10000,
+
+        'depth': 5,
+
         'epsilon_delay_decay': 2000,
-        'intermediate_size': 512,
-        'depth': 6,
+
+        'intermediate_size': 256,
+
         'criterion': torch.nn.SmoothL1Loss(),
+
         'learning_rate': 0.01,
         'gradient_steps': 1,
-        'update_target_strategy': 'ema',
-        'update_target_freq': 20,
-        'update_target_tau': 0.05,
-        'monitoring_nb_trials': 0,
-        'monitoring_freq': 10
     }
 
     agent = ProjectAgent()
