@@ -48,29 +48,28 @@ class DQN(nn.Module):
             x = F.relu(hidden_layer(x))
         return self.out_layer(x)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--max_episode', type=int, default=1000)
-parser.add_argument('--model_name', type=str, default='best_agent_1')
-parser.add_argument('--gamma', type=float, default=0.95)
-parser.add_argument('--batch_size', type=int, default=512)
-parser.add_argument('--buffer_size', type=int, default=1000000)
-parser.add_argument('--epsilon_max', type=float, default=1.)
-parser.add_argument('--epsilon_min', type=float, default=0.01)
-parser.add_argument('--epsilon_decay_period', type=int, default=1000)
-parser.add_argument('--epsilon_delay_decay', type=int, default=20)
-parser.add_argument('--intermediate_size', type=int, default=256)
-parser.add_argument('--depth', type=int, default=5)
-parser.add_argument('--learning_rate', type=float, default=0.001)
-parser.add_argument('--gradient_steps', type=int, default=1)
-parser.add_argument('--update_target_strategy', type=str, default='replace')
-parser.add_argument('--update_target_freq', type=int, default=20)
-parser.add_argument('--update_target_tau', type=float, default=0.005)
-parser.add_argument('--monitoring_nb_trials', type=int, default=0)
-parser.add_argument('--monitoring_freq', type=int, default=10)
-parser.add_argument('--criterion', type=nn.Module, default=torch.nn.SmoothL1Loss())
 
-args = parser.parse_args()
-config = vars(args)
+
+config = {'model_name': 'best_agent_4',
+        'max_episode': 300,
+        'gamma': 0.9,
+        'batch_size': 1024,
+        'buffer_size': 1000000,
+        'intermediate_size': 512,
+        'depth': 6,
+        'criterion': torch.nn.SmoothL1Loss(),
+        'learning_rate': 0.01,
+        'gradient_steps': 1,
+        'update_target_strategy': 'ema',
+        'update_target_freq': 20,
+        'update_target_tau': 0.05,
+        'monitoring_nb_trials': 0,
+        'monitoring_freq': 10,
+        'epsilon_max': 1.,
+        'epsilon_min': 0.01,
+        'epsilon_decay_period': 10000,
+        'epsilon_delay_decay': 2000
+    }
 
 class ProjectAgent:
     def __init__(self):
@@ -99,7 +98,7 @@ class ProjectAgent:
         self.update_target_tau = config['update_target_tau'] if 'update_target_tau' in config.keys() else 0.005
         self.monitoring_nb_trials = config['monitoring_nb_trials'] if 'monitoring_nb_trials' in config.keys() else 0
         self.monitoring_freq = config['monitoring_freq'] if 'monitoring_freq' in config.keys() else 10
-        self.delay_save = config['delay_save'] if 'delay_save' in config.keys() else 100
+        self.delay_save = 30
         
     def greedy_action(self, network, state):
         with torch.no_grad():
@@ -112,7 +111,7 @@ class ProjectAgent:
         else:
             return self.greedy_action(self.model, observation)
 
-    def MC_eval(self, env, nb_trials):   # NEW NEW NEW
+    def MC_eval(self, env, nb_trials): 
         MC_total_reward = []
         MC_discounted_reward = []
         for _ in range(nb_trials):
@@ -154,9 +153,9 @@ class ProjectAgent:
     
     def train(self, env, max_episode):
         episode_return = []
-        MC_avg_total_reward = []   # NEW NEW NEW
-        MC_avg_discounted_reward = []   # NEW NEW NEW
-        V_init_state = []   # NEW NEW NEW
+        MC_avg_total_reward = []  
+        MC_avg_discounted_reward = []   
+        V_init_state = []   
         episode = 0
         episode_cum_reward = 0
         state, _ = env.reset()
@@ -241,49 +240,33 @@ class ProjectAgent:
         
 if __name__ == "__main__":
     
-    
+
+
     config = {
-        'max_episode': 100,
-        
-        'model_name': 'best_score_agent',
-        
-        'update_target_strategy': 'ema',
-        
-        'update_target_freq': 20,
-        
-        'update_target_tau': 0.05,
-        
-        'monitoring_nb_trials': 0,
-
-        'monitoring_freq': 10,
-
+        'max_episode': 300,
+        'model_name': 'best_agent_4',
         'gamma': 0.9,
-
-        'epsilon_max': 1.,
-
-        'epsilon_min': 0.01,
-
         'batch_size': 1024,
-
-        'buffer_size': 10000,
-
+        'buffer_size': 1000000,
+        'epsilon_max': 1.,
+        'epsilon_min': 0.01,
         'epsilon_decay_period': 10000,
-
-        'depth': 5,
-
         'epsilon_delay_decay': 2000,
-
-        'intermediate_size': 256,
-
+        'intermediate_size': 512,
+        'depth': 6,
         'criterion': torch.nn.SmoothL1Loss(),
-
         'learning_rate': 0.01,
-
         'gradient_steps': 1,
+        'update_target_strategy': 'ema',
+        'update_target_freq': 20,
+        'update_target_tau': 0.05,
+        'monitoring_nb_trials': 0,
+        'monitoring_freq': 10
     }
 
     agent = ProjectAgent()
     episode_return, MC_avg_discounted_reward, MC_avg_total_reward, V_init_state = agent.train(env, config['max_episode'])
-    
+
     print("agent name:" + config['model_name'] + ".pth")
     print('config:', config)
+    
